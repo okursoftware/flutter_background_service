@@ -1,11 +1,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.piri.test">
+    package="com.piri.testtimetick">
 
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
    <application
-        android:label="Watchdog Test"
+        android:label="Watchdog Test TimeTick"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
 

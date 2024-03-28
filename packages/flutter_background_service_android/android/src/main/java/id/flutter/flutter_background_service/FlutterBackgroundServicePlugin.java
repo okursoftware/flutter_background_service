@@ -74,7 +74,7 @@ public class FlutterBackgroundServicePlugin implements FlutterPlugin, MethodCall
     }
 
     private void start() {
-        WatchdogReceiver.enqueue(context);
+        //WatchdogReceiver.enqueue(context);
         boolean isForeground = config.isForeground();
         Intent intent = new Intent(context, BackgroundService.class);
 
@@ -119,6 +119,23 @@ public class FlutterBackgroundServicePlugin implements FlutterPlugin, MethodCall
 
             if ("start".equals(method)) {
                 start();
+                result.success(true);
+                return;
+            }
+            if ("power-saver".equals(method)) {
+
+                Intent intent = null;
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                    intent = PowerSaverHelper.prepareIntentForWhiteListingOfBatteryOptimization(context,context.getPackageName(),false);
+                }
+                if (intent != null) {
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    this.context.startActivity(intent);
+                   // startActivity(intent);
+
+                }
+              //  PowerSaverHelper.prepareIntentForWhiteListingOfBatteryOptimization(requireContext())?.let { startActivity(it) }
+
                 result.success(true);
                 return;
             }

@@ -4,6 +4,7 @@ import 'dart:ui';
 
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'package:flutter_background_service_android/flutter_background_service_android.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -219,6 +220,17 @@ class _MyAppState extends State<MyApp> {
               child: const Text("Background Mode"),
               onPressed: () {
                 FlutterBackgroundService().invoke("setAsBackground");
+              },
+            ),
+            ElevatedButton(
+              child: const Text("Power Saver"),
+              onPressed: () {
+                final MethodChannel _channel = MethodChannel(
+                  'id.flutter/background_service/android/method',
+                  JSONMethodCodec(),
+                );
+
+                _channel.invokeMethod('power-saver');
               },
             ),
             ElevatedButton(

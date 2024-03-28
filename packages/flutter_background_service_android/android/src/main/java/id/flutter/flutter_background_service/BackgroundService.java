@@ -109,7 +109,7 @@ public class BackgroundService extends Service implements MethodChannel.MethodCa
     @Override
     public void onDestroy() {
         if (!isManuallyStopped) {
-            WatchdogReceiver.enqueue(this);
+          //  WatchdogReceiver.eueue(this);
         } else {
             config.setManuallyStopped(true);
         }
@@ -179,7 +179,7 @@ public class BackgroundService extends Service implements MethodChannel.MethodCa
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         config.setManuallyStopped(false);
-        WatchdogReceiver.enqueue(this);
+       // WatchdogReceiver.enqueue(this);
         runService();
 
         return START_STICKY;
@@ -250,7 +250,7 @@ public class BackgroundService extends Service implements MethodChannel.MethodCa
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         if (isRunning.get()) {
-            WatchdogReceiver.enqueue(getApplicationContext(), 1000);
+           // WatchdogReceiver.enqueue(getApplicationContext(), 1000);
         }
     }
 
@@ -302,7 +302,7 @@ public class BackgroundService extends Service implements MethodChannel.MethodCa
 
             if (method.equalsIgnoreCase("stopService")) {
                 isManuallyStopped = true;
-                WatchdogReceiver.remove(this);
+               // WatchdogReceiver.remove(this);
                 stopSelf();
                 result.success(true);
                 return;

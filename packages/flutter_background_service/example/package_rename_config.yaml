@@ -1,0 +1,5 @@
+package_rename_config:
+  android:
+    app_name: Watchdog Test
+    package_name: com.piri.test
+    override_old_package: id.flutter.example

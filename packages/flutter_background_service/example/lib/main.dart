@@ -119,6 +119,7 @@ void onStart(ServiceInstance service) async {
   });
 
   // bring to foreground
+  /*
   Timer.periodic(const Duration(seconds: 1), (timer) async {
     if (service is AndroidServiceInstance) {
       if (await service.isForegroundService()) {
@@ -170,6 +171,7 @@ void onStart(ServiceInstance service) async {
       },
     );
   });
+   */
 }
 
 class MyApp extends StatefulWidget {

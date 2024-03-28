@@ -11,6 +11,7 @@ import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.ServiceInfo;
 import android.os.Build;
 import android.os.Handler;
@@ -19,6 +20,7 @@ import android.os.Looper;
 import android.os.PowerManager;
 import android.os.PowerManager.WakeLock;
 import android.os.SystemClock;
+import android.text.format.DateFormat;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -72,6 +74,38 @@ public class BackgroundService extends Service implements MethodChannel.MethodCa
         return lockStatic;
     }
 
+    private BroadcastReceiver timeTickReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            final String action = intent.getAction();
+
+            if(action == null) return;
+
+            if (isScreenOn(context) || action.equalsIgnoreCase("android.intent.action.SCREEN_ON")){
+                Log.d("timeTickReceiver", "Screen On");
+                updateNotificationInfo();
+            }
+        }
+    };
+
+    boolean isScreenOn(Context context){
+        final PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);
+        return  Build.VERSION.SDK_INT > Build.VERSION_CODES.KITKAT ? pm.isInteractive(): pm.isScreenOn();
+    }
+    void registerTimeTickReceiver(){
+        IntentFilter filter = new IntentFilter(Intent.ACTION_TIME_TICK);
+        filter.addAction(Intent.ACTION_TIME_CHANGED);
+        filter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
+        filter.addAction(Intent.ACTION_SCREEN_ON);
+
+        registerReceiver(timeTickReceiver,filter);
+    }
+
+    String convertDate() {
+        return DateFormat.format( "HH:mm:ss z yyyy", System.currentTimeMillis()).toString();
+    }
+
     @Override
     public IBinder onBind(Intent intent) {
         return null;
@@ -102,6 +136,8 @@ public class BackgroundService extends Service implements MethodChannel.MethodCa
         notificationTitle = config.getInitialNotificationTitle();
         notificationContent = config.getInitialNotificationContent();
         notificationId = config.getForegroundNotificationId();
+
+        registerTimeTickReceiver();
         updateNotificationInfo();
         onStartCommand(null, -1, -1);
     }
@@ -159,17 +195,19 @@ public class BackgroundService extends Service implements MethodChannel.MethodCa
                 flags |= PendingIntent.FLAG_MUTABLE;
             }
 
+            final String time = convertDate();
+
             PendingIntent pi = PendingIntent.getActivity(BackgroundService.this, 11, i, flags);
             NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this, notificationChannelId)
                     .setSmallIcon(R.drawable.ic_bg_service_small)
                     .setAutoCancel(true)
                     .setOngoing(true)
                     .setContentTitle(notificationTitle)
-                    .setContentText(notificationContent)
+                    .setContentText(notificationContent + time)
                     .setContentIntent(pi);
 
             try {
-                ServiceCompat.startForeground(this, notificationId, mBuilder.build(), ServiceInfo.FOREGROUND_SERVICE_TYPE_MANIFEST);
+                startForeground(notificationId, mBuilder.build());
             } catch (SecurityException e) {
               Log.w(TAG, "Failed to start foreground service due to SecurityException - have you forgotten to request a permission? - " + e.getMessage());
             }

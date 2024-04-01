@@ -236,6 +236,17 @@ class _MyAppState extends State<MyApp> {
               },
             ),
             ElevatedButton(
+              child: const Text("Power Settings"),
+              onPressed: () {
+                final MethodChannel _channel = MethodChannel(
+                  'id.flutter/background_service/android/method',
+                  JSONMethodCodec(),
+                );
+
+                _channel.invokeMethod('power-settings');
+              },
+            ),
+            ElevatedButton(
               child: Text(text),
               onPressed: () async {
                 final service = FlutterBackgroundService();

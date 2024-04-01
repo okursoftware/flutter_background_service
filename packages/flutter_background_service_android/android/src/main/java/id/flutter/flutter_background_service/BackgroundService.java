@@ -62,18 +62,6 @@ public class BackgroundService extends Service implements MethodChannel.MethodCa
     private int notificationId;
     private Handler mainHandler;
 
-    synchronized public static PowerManager.WakeLock getLock(Context context) {
-        if (lockStatic == null) {
-            PowerManager mgr = (PowerManager) context
-                    .getSystemService(Context.POWER_SERVICE);
-            lockStatic = mgr.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK,
-                    LOCK_NAME);
-            lockStatic.setReferenceCounted(true);
-        }
-
-        return lockStatic;
-    }
-
     private BroadcastReceiver timeTickReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -230,9 +218,6 @@ public class BackgroundService extends Service implements MethodChannel.MethodCa
                 Log.v(TAG, "Service already running, using existing service");
                 return;
             }
-
-            Log.v(TAG, "Starting flutter engine for background service");
-            getLock(getApplicationContext()).acquire();
 
             updateNotificationInfo();
 

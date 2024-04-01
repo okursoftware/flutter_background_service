@@ -1,4 +1,4 @@
-package com.piri.testtimetick
+package com.piri.testpernopm
 
 import io.flutter.embedding.android.FlutterActivity
 

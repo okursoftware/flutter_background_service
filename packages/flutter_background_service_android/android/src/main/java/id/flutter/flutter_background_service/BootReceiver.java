@@ -16,10 +16,6 @@ public class BootReceiver extends BroadcastReceiver {
             final Config config = new Config(context);
             boolean autoStart = config.isAutoStartOnBoot();
             if (autoStart) {
-                if (BackgroundService.lockStatic == null) {
-                    BackgroundService.getLock(context).acquire();
-                }
-
                 if (config.isForeground()) {
                     ContextCompat.startForegroundService(context, new Intent(context, BackgroundService.class));
                 } else {

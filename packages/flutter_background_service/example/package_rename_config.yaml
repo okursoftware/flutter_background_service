@@ -1,5 +1,5 @@
 package_rename_config:
   android:
-    app_name: Watchdog Test TimeTick
-    package_name: com.piri.testtimetick
-    override_old_package: com.piri.test
+    app_name: TT-Per-NoPM
+    package_name: com.piri.testpernopm
+    override_old_package: com.piri.testnopm

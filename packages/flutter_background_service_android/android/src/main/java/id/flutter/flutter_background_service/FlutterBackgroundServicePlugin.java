@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.os.Handler;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
@@ -139,7 +140,19 @@ public class FlutterBackgroundServicePlugin implements FlutterPlugin, MethodCall
                 result.success(true);
                 return;
             }
+            if ("power-settings".equals(method)) {
 
+
+                Intent intent = new Intent();
+                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                }
+                intent.setAction(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+                context.startActivity(intent);
+
+                result.success(true);
+                return;
+            }
             if (method.equalsIgnoreCase("sendData")) {
                 synchronized (servicePipe){
                     if (servicePipe.hasListener()){

@@ -75,7 +75,7 @@ public class BackgroundService extends Service implements MethodChannel.MethodCa
               //  updateNotificationInfo();
                 Intent i = new Intent("com.piri.timetick.intent.ACTION");
                 //i.putExtra("key", "value"); // İstediğiniz veriyi ekleyin
-                sendBroadcast(i);
+                context.sendBroadcast(i);
             }
         }
     };

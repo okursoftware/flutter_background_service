@@ -7,7 +7,7 @@ public class Config {
     final SharedPreferences pref;
 
     public Config(Context context) {
-        this.pref = context.getSharedPreferences("id.flutter.background_service", Context.MODE_PRIVATE);
+        this.pref = context.getSharedPreferences("home_widget_native_path", Context.MODE_PRIVATE);
     }
 
     public boolean isAutoStartOnBoot() {
@@ -40,6 +40,10 @@ public class Config {
 
     public long getBackgroundHandle() {
         return pref.getLong("background_handle", 0);
+    }
+
+    public long getNotification() {
+        return pref.getLong("home_widget_native_path.TIME_CHANGE_CALLBACK_DISPATCHER_HANDLE_KEY", 0);
     }
 
     public void setBackgroundHandle(long value) {

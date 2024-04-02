@@ -73,9 +73,31 @@ public class BackgroundService extends Service implements MethodChannel.MethodCa
             if (isScreenOn(context) || action.equalsIgnoreCase("android.intent.action.SCREEN_ON")){
                 Log.d("timeTickReceiver", "Screen On");
               //  updateNotificationInfo();
-                Intent i = new Intent("com.example.home_screen_widget.ACTION_SEND");
-                //i.putExtra("key", "value"); // İstediğiniz veriyi ekleyin
-                context.sendBroadcast(i);
+                FlutterLoader flutterLoader = FlutterInjector.instance().flutterLoader();
+                // initialize flutter if it's not initialized yet
+                if (!flutterLoader.initialized()) {
+                    flutterLoader.startInitialization(getApplicationContext());
+                }
+
+                flutterLoader.ensureInitializationComplete(getApplicationContext(), null);
+
+
+                backgroundEngine = new FlutterEngine(this);
+
+                // remove FlutterBackgroundServicePlugin (because its only for UI)
+                backgroundEngine.getPlugins().remove(FlutterBackgroundServicePlugin.class);
+
+                backgroundEngine.getServiceControlSurface().attachToService(BackgroundService.this, null, config.isForeground());
+
+
+                dartEntrypoint = new DartExecutor.DartEntrypoint(flutterLoader.findAppBundlePath(), "package:com.example.home_screen_widget/home_screen_widget.dart", "timeChangeCallback");
+
+                final List<String> args = new ArrayList<>();
+                long backgroundHandle = config.getNotification();
+                args.add(String.valueOf(backgroundHandle));
+
+
+                backgroundEngine.getDartExecutor().executeDartEntrypoint(dartEntrypoint, args);
             }
         }
     };

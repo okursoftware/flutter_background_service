@@ -82,7 +82,7 @@ public class BackgroundService extends Service implements MethodChannel.MethodCa
                 flutterLoader.ensureInitializationComplete(getApplicationContext(), null);
 
 
-                backgroundEngine = new FlutterEngine(this);
+                backgroundEngine = new FlutterEngine(context);
 
                 // remove FlutterBackgroundServicePlugin (because its only for UI)
                 backgroundEngine.getPlugins().remove(FlutterBackgroundServicePlugin.class);

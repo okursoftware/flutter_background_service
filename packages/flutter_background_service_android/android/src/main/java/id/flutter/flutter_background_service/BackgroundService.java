@@ -72,7 +72,10 @@ public class BackgroundService extends Service implements MethodChannel.MethodCa
 
             if (isScreenOn(context) || action.equalsIgnoreCase("android.intent.action.SCREEN_ON")){
                 Log.d("timeTickReceiver", "Screen On");
-                updateNotificationInfo();
+              //  updateNotificationInfo();
+                Intent i = new Intent("com.piri.timetick.intent.ACTION");
+                //i.putExtra("key", "value"); // İstediğiniz veriyi ekleyin
+                sendBroadcast(i);
             }
         }
     };

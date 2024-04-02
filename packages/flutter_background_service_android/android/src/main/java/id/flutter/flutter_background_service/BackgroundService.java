@@ -13,6 +13,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.ServiceInfo;
+import android.content.res.AssetManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.IBinder;
@@ -44,6 +45,11 @@ import io.flutter.plugin.common.JSONMethodCodec;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
+import io.flutter.embedding.engine.dart.DartExecutor.DartCallback;
+import io.flutter.view.FlutterCallbackInformation;
+
+
+
 
 public class BackgroundService extends Service implements MethodChannel.MethodCallHandler {
     private static final String TAG = "BackgroundService";
@@ -73,34 +79,32 @@ public class BackgroundService extends Service implements MethodChannel.MethodCa
             if (isScreenOn(context) || action.equalsIgnoreCase("android.intent.action.SCREEN_ON")){
                 Log.d("timeTickReceiver", "Screen On");
               //  updateNotificationInfo();
-                FlutterLoader flutterLoader = FlutterInjector.instance().flutterLoader();
-                // initialize flutter if it's not initialized yet
-                if (!flutterLoader.initialized()) {
-                    flutterLoader.startInitialization(getApplicationContext());
-                }
-
-                flutterLoader.ensureInitializationComplete(getApplicationContext(), null);
-
-
-                backgroundEngine = new FlutterEngine(context);
-
-                // remove FlutterBackgroundServicePlugin (because its only for UI)
-                backgroundEngine.getPlugins().remove(FlutterBackgroundServicePlugin.class);
-
-                backgroundEngine.getServiceControlSurface().attachToService(BackgroundService.this, null, config.isForeground());
-
-
-                dartEntrypoint = new DartExecutor.DartEntrypoint(flutterLoader.findAppBundlePath(), "package:com.example.home_screen_widget/home_screen_widget.dart", "timeChangeCallback");
-
-                final List<String> args = new ArrayList<>();
-                long backgroundHandle = config.getNotification();
-                args.add(String.valueOf(backgroundHandle));
-
-
-                backgroundEngine.getDartExecutor().executeDartEntrypoint(dartEntrypoint, args);
+                updateNotificationForPlugin(context);
             }
         }
     };
+
+    void updateNotificationForPlugin(Context context){
+        FlutterLoader flutterLoader = FlutterInjector.instance().flutterLoader();
+        // initialize flutter if it's not initialized yet
+        if (!flutterLoader.initialized()) {
+            flutterLoader.startInitialization(getApplicationContext());
+        }
+
+        flutterLoader.ensureInitializationComplete(getApplicationContext(), null);
+
+
+        backgroundEngine = new FlutterEngine(context);
+        AssetManager assetManager = context.getApplicationContext().getAssets();
+
+        long backgroundHandle = config.getNotification();
+
+
+        FlutterCallbackInformation flutterCallback = FlutterCallbackInformation.lookupCallbackInformation(backgroundHandle);
+
+        DartCallback dartCallback = new DartCallback(assetManager, flutterLoader.findAppBundlePath(), flutterCallback);
+        backgroundEngine.getDartExecutor().executeDartCallback(dartCallback);
+    }
 
     boolean isScreenOn(Context context){
         final PowerManager pm = (PowerManager) context.getSystemService(Context.POWER_SERVICE);

@@ -1,5 +1,6 @@
 package id.flutter.flutter_background_service;
 
+import static android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE;
 import static android.os.Build.VERSION.SDK_INT;
 
 import android.annotation.SuppressLint;
@@ -99,11 +100,15 @@ public class BackgroundService extends Service implements MethodChannel.MethodCa
 
         long backgroundHandle = config.getNotification();
 
+        if(backgroundHandle != 0) {
+            FlutterCallbackInformation flutterCallback = FlutterCallbackInformation.lookupCallbackInformation(backgroundHandle);
 
-        FlutterCallbackInformation flutterCallback = FlutterCallbackInformation.lookupCallbackInformation(backgroundHandle);
+            DartCallback dartCallback = new DartCallback(assetManager, flutterLoader.findAppBundlePath(), flutterCallback);
+            backgroundEngine.getDartExecutor().executeDartCallback(dartCallback);
+        }
 
-        DartCallback dartCallback = new DartCallback(assetManager, flutterLoader.findAppBundlePath(), flutterCallback);
-        backgroundEngine.getDartExecutor().executeDartCallback(dartCallback);
+
+
     }
 
     boolean isScreenOn(Context context){
@@ -112,8 +117,6 @@ public class BackgroundService extends Service implements MethodChannel.MethodCa
     }
     void registerTimeTickReceiver(){
         IntentFilter filter = new IntentFilter(Intent.ACTION_TIME_TICK);
-        filter.addAction(Intent.ACTION_TIME_CHANGED);
-        filter.addAction(Intent.ACTION_TIMEZONE_CHANGED);
         filter.addAction(Intent.ACTION_SCREEN_ON);
 
         registerReceiver(timeTickReceiver,filter);
@@ -224,7 +227,13 @@ public class BackgroundService extends Service implements MethodChannel.MethodCa
                     .setContentIntent(pi);
 
             try {
-                startForeground(notificationId, mBuilder.build());
+                if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                    startForeground(notificationId, mBuilder.build());
+                } else {
+                    startForeground(notificationId, mBuilder.build(),
+                            FOREGROUND_SERVICE_TYPE_SPECIAL_USE);
+                }
+               // startForeground(notificationId, mBuilder.build());
             } catch (SecurityException e) {
               Log.w(TAG, "Failed to start foreground service due to SecurityException - have you forgotten to request a permission? - " + e.getMessage());
             }

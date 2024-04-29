@@ -2,6 +2,8 @@
   <library name="Flutter Plugins" type="FlutterPluginsLibraryType">
     <CLASSES>
       <root url="file://$PROJECT_DIR$/packages/flutter_background_service_android" />
+      <root url="file://$PROJECT_DIR$/packages/flutter_background_service" />
+      <root url="file://$USER_HOME$/.pub-cache/hosted/pub.dev/flutter_background_service_ios-5.0.0" />
     </CLASSES>
     <JAVADOC />
     <SOURCES />
